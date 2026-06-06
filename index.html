@@ -1,331 +1,495 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Sandals Business Manager</title>
 
-<link rel="stylesheet" href="styles.css">
+<style>
+body{
+font-family:Arial,sans-serif;
+margin:0;
+background:#f5f5f5;
+}
 
-<link rel="manifest" href="manifest.json">
+header{
+background:#1f2937;
+color:white;
+padding:15px;
+text-align:center;
+}
 
-<meta name="theme-color" content="#0f172a">
+.container{
+padding:10px;
+}
+
+.card{
+background:white;
+padding:15px;
+margin-bottom:10px;
+border-radius:10px;
+box-shadow:0 2px 5px rgba(0,0,0,.1);
+}
+
+input,select{
+width:100%;
+padding:10px;
+margin:5px 0;
+box-sizing:border-box;
+}
+
+button{
+width:100%;
+padding:10px;
+background:#1f2937;
+color:white;
+border:none;
+border-radius:5px;
+}
+
+nav{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+display:flex;
+background:white;
+border-top:1px solid #ddd;
+}
+
+nav button{
+flex:1;
+border-radius:0;
+}
+
+.page{
+display:none;
+padding-bottom:80px;
+}
+
+.active{
+display:block;
+}
+
+h3{
+margin-top:0;
+}
+
+.list-item{
+border-bottom:1px solid #ddd;
+padding:8px 0;
+}
+</style>
 </head>
 
 <body>
 
-<!-- LOGIN SCREEN -->
-<div id="loginScreen" class="screen active">
+<header>
+<h2>👡 Sandals Business Manager</h2>
+</header>
 
-    <div class="login-card">
-        <h1>👡 Sandals Manager</h1>
+<div class="container">
 
-        <input
-            type="email"
-            id="email"
-            placeholder="Email"
-        >
+<div id="dashboard" class="page active">
 
-        <input
-            type="password"
-            id="password"
-            placeholder="Password"
-        >
+<div class="card">
+<h3>Dashboard</h3>
 
-        <button id="loginBtn">
-            Login
-        </button>
-
-        <p id="loginMessage"></p>
-    </div>
+<p><b>Sales:</b> KSh <span id="salesTotal">0</span></p>
+<p><b>Expenses:</b> KSh <span id="expenseTotal">0</span></p>
+<p><b>Profit:</b> KSh <span id="profitTotal">0</span></p>
+</div>
 
 </div>
 
-<!-- APP -->
-<div id="appScreen" class="screen">
+<div id="inventory" class="page">
 
-    <!-- HEADER -->
-    <header>
+<div class="card">
 
-        <div>
-            <h2>Sandals Manager</h2>
-            <span id="currentUser"></span>
-        </div>
+<h3>Add Inventory</h3>
 
-        <button id="logoutBtn">
-            Logout
-        </button>
+<input id="name" placeholder="Product Name">
 
-    </header>
+<input id="color" placeholder="Color">
 
-    <!-- DASHBOARD -->
-    <section id="dashboardSection" class="page active">
+<input id="size" placeholder="Size">
 
-        <h3>Dashboard</h3>
+<input id="stock" type="number" placeholder="Stock">
 
-        <div class="cards">
+<input id="price" type="number" placeholder="Selling Price">
 
-            <div class="card">
-                <span>Sales Today</span>
-                <h2 id="salesToday">
-                    KSh 0
-                </h2>
-            </div>
-
-            <div class="card">
-                <span>Expenses Today</span>
-                <h2 id="expensesToday">
-                    KSh 0
-                </h2>
-            </div>
-
-            <div class="card">
-                <span>Profit Today</span>
-                <h2 id="profitToday">
-                    KSh 0
-                </h2>
-            </div>
-
-            <div class="card">
-                <span>Stock Pairs</span>
-                <h2 id="stockCount">
-                    0
-                </h2>
-            </div>
-
-        </div>
-
-        <div class="recent-box">
-
-            <h4>Recent Activity</h4>
-
-            <ul id="recentActivity">
-
-                <li>No activity yet</li>
-
-            </ul>
-
-        </div>
-
-    </section>
-
-    <!-- INVENTORY -->
-    <section id="inventorySection" class="page">
-
-        <h3>Inventory</h3>
-
-        <div class="form-card">
-
-            <input
-                type="text"
-                id="productName"
-                placeholder="Product Name"
-            >
-
-            <input
-                type="text"
-                id="category"
-                placeholder="Category"
-            >
-
-            <input
-                type="number"
-                id="costPrice"
-                placeholder="Cost Price"
-            >
-
-            <input
-                type="number"
-                id="sellingPrice"
-                placeholder="Selling Price"
-            >
-
-            <input
-                type="text"
-                id="color"
-                placeholder="Color"
-            >
-
-            <input
-                type="text"
-                id="size"
-                placeholder="Size"
-            >
-
-            <input
-                type="number"
-                id="stock"
-                placeholder="Stock Quantity"
-            >
-
-            <button id="addInventoryBtn">
-                Add Product
-            </button>
-
-        </div>
-
-        <div id="inventoryList"></div>
-
-    </section>
-
-    <!-- SALES -->
-    <section id="salesSection" class="page">
-
-        <h3>Record Sale</h3>
-
-        <div class="form-card">
-
-            <select id="saleProduct">
-                <option value="">
-                    Select Product
-                </option>
-            </select>
-
-            <select id="saleColor">
-                <option value="">
-                    Select Color
-                </option>
-            </select>
-
-            <select id="saleSize">
-                <option value="">
-                    Select Size
-                </option>
-            </select>
-
-            <input
-                type="number"
-                id="saleQty"
-                placeholder="Quantity"
-            >
-
-            <button id="saveSaleBtn">
-                Save Sale
-            </button>
-
-        </div>
-
-        <div id="salesHistory"></div>
-
-    </section>
-
-    <!-- EXPENSES -->
-    <section id="expensesSection" class="page">
-
-        <h3>Expenses</h3>
-
-        <div class="form-card">
-
-            <select id="expenseCategory">
-
-                <option>
-                    Transport
-                </option>
-
-                <option>
-                    Rent
-                </option>
-
-                <option>
-                    Packaging
-                </option>
-
-                <option>
-                    Airtime
-                </option>
-
-                <option>
-                    Other
-                </option>
-
-            </select>
-
-            <input
-                type="number"
-                id="expenseAmount"
-                placeholder="Amount"
-            >
-
-            <input
-                type="text"
-                id="expenseDescription"
-                placeholder="Description"
-            >
-
-            <button id="saveExpenseBtn">
-                Save Expense
-            </button>
-
-        </div>
-
-        <div id="expenseList"></div>
-
-    </section>
-
-    <!-- REPORTS -->
-    <section id="reportsSection" class="page">
-
-        <h3>Reports</h3>
-
-        <div class="cards">
-
-            <div class="card">
-                <span>Monthly Sales</span>
-                <h2 id="monthlySales">
-                    KSh 0
-                </h2>
-            </div>
-
-            <div class="card">
-                <span>Monthly Expenses</span>
-                <h2 id="monthlyExpenses">
-                    KSh 0
-                </h2>
-            </div>
-
-            <div class="card">
-                <span>Monthly Profit</span>
-                <h2 id="monthlyProfit">
-                    KSh 0
-                </h2>
-            </div>
-
-        </div>
-
-        <canvas id="reportChart"></canvas>
-
-    </section>
-
-    <!-- BOTTOM NAV -->
-
-    <nav class="bottom-nav">
-
-        <button data-page="dashboardSection">
-            Dashboard
-        </button>
-
-        <button data-page="inventorySection">
-            Inventory
-        </button>
-
-        <button data-page="salesSection">
-            Sales
-        </button>
-
-        <button data-page="expensesSection">
-            Expenses
-        </button>
-
-        <button data-page="reportsSection">
-            Reports
-        </button>
-
-    </nav>
+<button onclick="addInventory()">
+Add Product
+</button>
 
 </div>
 
-<script type="module" src="app.js"></script>
+<div class="card">
+
+<h3>Inventory List</h3>
+
+<div id="inventoryList"></div>
+
+</div>
+
+</div>
+
+<div id="sales" class="page">
+
+<div class="card">
+
+<h3>Record Sale</h3>
+
+<select id="saleProduct"></select>
+
+<input id="saleQty"
+type="number"
+placeholder="Quantity">
+
+<button onclick="saveSale()">
+Save Sale
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Sales History</h3>
+
+<div id="salesList"></div>
+
+</div>
+
+</div>
+
+<div id="expenses" class="page">
+
+<div class="card">
+
+<h3>Add Expense</h3>
+
+<input id="expenseName"
+placeholder="Expense">
+
+<input id="expenseAmount"
+type="number"
+placeholder="Amount">
+
+<button onclick="saveExpense()">
+Save Expense
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>Expense History</h3>
+
+<div id="expenseList"></div>
+
+</div>
+
+</div>
+
+</div>
+
+<nav>
+
+<button onclick="showPage('dashboard')">
+Dashboard
+</button>
+
+<button onclick="showPage('inventory')">
+Inventory
+</button>
+
+<button onclick="showPage('sales')">
+Sales
+</button>
+
+<button onclick="showPage('expenses')">
+Expenses
+</button>
+
+</nav>
+
+<script>
+
+let inventory =
+JSON.parse(localStorage.getItem("inventory")) || [];
+
+let sales =
+JSON.parse(localStorage.getItem("sales")) || [];
+
+let expenses =
+JSON.parse(localStorage.getItem("expenses")) || [];
+
+function saveData(){
+
+localStorage.setItem(
+"inventory",
+JSON.stringify(inventory)
+);
+
+localStorage.setItem(
+"sales",
+JSON.stringify(sales)
+);
+
+localStorage.setItem(
+"expenses",
+JSON.stringify(expenses)
+);
+
+}
+
+function showPage(id){
+
+document
+.querySelectorAll(".page")
+.forEach(p=>p.classList.remove("active"));
+
+document
+.getElementById(id)
+.classList.add("active");
+
+}
+
+function addInventory(){
+
+const item = {
+
+name:name.value,
+color:color.value,
+size:size.value,
+stock:Number(stock.value),
+price:Number(price.value)
+
+};
+
+inventory.push(item);
+
+saveData();
+
+name.value="";
+color.value="";
+size.value="";
+stock.value="";
+price.value="";
+
+renderInventory();
+
+}
+
+function renderInventory(){
+
+inventoryList.innerHTML="";
+saleProduct.innerHTML="";
+
+inventory.forEach((item,index)=>{
+
+inventoryList.innerHTML += `
+
+<div class="list-item">
+
+<b>${item.name}</b><br>
+
+Color: ${item.color}<br>
+
+Size: ${item.size}<br>
+
+Stock: ${item.stock}<br>
+
+Price: KSh ${item.price}
+
+</div>
+
+`;
+
+saleProduct.innerHTML += `
+
+<option value="${index}">
+${item.name} (${item.color})
+Size ${item.size}
+</option>
+
+`;
+
+});
+
+updateDashboard();
+
+}
+
+function saveSale(){
+
+let idx =
+saleProduct.value;
+
+let qty =
+Number(saleQty.value);
+
+if(qty<=0) return;
+
+if(inventory[idx].stock < qty){
+
+alert("Not enough stock");
+
+return;
+
+}
+
+inventory[idx].stock -= qty;
+
+sales.push({
+
+product:
+inventory[idx].name,
+
+color:
+inventory[idx].color,
+
+size:
+inventory[idx].size,
+
+qty,
+
+amount:
+qty * inventory[idx].price
+
+});
+
+saveData();
+
+saleQty.value="";
+
+renderInventory();
+
+renderSales();
+
+}
+
+function renderSales(){
+
+salesList.innerHTML="";
+
+sales.forEach(s=>{
+
+salesList.innerHTML += `
+
+<div class="list-item">
+
+${s.product}
+(${s.color})
+
+Size ${s.size}
+
+<br>
+
+Qty: ${s.qty}
+
+<br>
+
+Amount:
+KSh ${s.amount}
+
+</div>
+
+`;
+
+});
+
+updateDashboard();
+
+}
+
+function saveExpense(){
+
+expenses.push({
+
+name:
+expenseName.value,
+
+amount:
+Number(expenseAmount.value)
+
+});
+
+saveData();
+
+expenseName.value="";
+expenseAmount.value="";
+
+renderExpenses();
+
+}
+
+function renderExpenses(){
+
+expenseList.innerHTML="";
+
+expenses.forEach(e=>{
+
+expenseList.innerHTML += `
+
+<div class="list-item">
+
+${e.name}
+
+<br>
+
+KSh ${e.amount}
+
+</div>
+
+`;
+
+});
+
+updateDashboard();
+
+}
+
+function updateDashboard(){
+
+let salesTotal =
+sales.reduce(
+(a,b)=>a+b.amount,
+0
+);
+
+let expenseTotal =
+expenses.reduce(
+(a,b)=>a+b.amount,
+0
+);
+
+salesTotalEl =
+document.getElementById("salesTotal");
+
+expenseTotalEl =
+document.getElementById("expenseTotal");
+
+profitTotalEl =
+document.getElementById("profitTotal");
+
+salesTotalEl.textContent =
+salesTotal;
+
+expenseTotalEl.textContent =
+expenseTotal;
+
+profitTotalEl.textContent =
+salesTotal-expenseTotal;
+
+}
+
+renderInventory();
+renderSales();
+renderExpenses();
+
+</script>
 
 </body>
 </html>
