@@ -362,6 +362,390 @@ Expenses
 </nav>
 
 <script src="app.js" type="module"></script>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    doc,
+    updateDoc,
+    onSnapshot
+}
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCKz5GaO3y3S6MZSLFgUCfJntyZW6r53_c",
+    authDomain: "sales-tracker-ed7d3.firebaseapp.com",
+    projectId: "sales-tracker-ed7d3",
+    storageBucket: "sales-tracker-ed7d3.firebasestorage.app",
+    messagingSenderId: "465463749935",
+    appId: "1:465463749935:web:1d5b3cb8c96f2f4224c5da"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let inventory = [];
+let sales = [];
+let expenses = [];
+
+/* ---------- NAVIGATION ---------- */
+
+window.showPage = function(pageId){
+
+    document
+    .querySelectorAll(".page")
+    .forEach(page=>page.classList.remove("active"));
+
+    document
+    .getElementById(pageId)
+    .classList.add("active");
+}
+
+/* ---------- INVENTORY ---------- */
+
+const addProductBtn =
+document.getElementById("addProductBtn");
+
+addProductBtn.addEventListener(
+"click",
+async ()=>{
+
+    const productName =
+    document.getElementById("productName").value;
+
+    const color =
+    document.getElementById("productColor").value;
+
+    const size =
+    document.getElementById("productSize").value;
+
+    const stock =
+    Number(
+    document.getElementById("productStock").value
+    );
+
+    const price =
+    Number(
+    document.getElementById("sellingPrice").value
+    );
+
+    if(
+        !productName ||
+        !color ||
+        !size ||
+        stock <= 0 ||
+        price <= 0
+    ){
+        alert("Fill all fields");
+        return;
+    }
+
+    await addDoc(
+        collection(db,"inventory"),
+        {
+            productName,
+            color,
+            size,
+            stock,
+            price,
+            createdAt:Date.now()
+        }
+    );
+
+    document.getElementById("productName").value="";
+    document.getElementById("productColor").value="";
+    document.getElementById("productSize").value="";
+    document.getElementById("productStock").value="";
+    document.getElementById("sellingPrice").value="";
+});
+
+/* ---------- REALTIME INVENTORY ---------- */
+
+onSnapshot(
+collection(db,"inventory"),
+(snapshot)=>{
+
+    inventory = [];
+
+    const inventoryList =
+    document.getElementById("inventoryList");
+
+    const saleProduct =
+    document.getElementById("saleProduct");
+
+    inventoryList.innerHTML="";
+    saleProduct.innerHTML=
+    `<option value="">Select Product</option>`;
+
+    snapshot.forEach(docSnap=>{
+
+        const item = {
+            id:docSnap.id,
+            ...docSnap.data()
+        };
+
+        inventory.push(item);
+
+        inventoryList.innerHTML += `
+        <div class="inventory-item">
+            <strong>${item.productName}</strong><br>
+            Color: ${item.color}<br>
+            Size: ${item.size}<br>
+            Stock: ${item.stock}<br>
+            Price: KSh ${item.price}
+        </div>
+        `;
+
+        saleProduct.innerHTML += `
+        <option value="${item.id}">
+            ${item.productName}
+            (${item.color})
+            Size ${item.size}
+        </option>
+        `;
+    });
+
+    document.getElementById(
+    "stockCount"
+    ).textContent = inventory.length;
+});
+
+/* ---------- SALES ---------- */
+
+const saveSaleBtn =
+document.getElementById("saveSaleBtn");
+
+saveSaleBtn.addEventListener(
+"click",
+async ()=>{
+
+    const productId =
+    document.getElementById("saleProduct").value;
+
+    const qty =
+    Number(
+    document.getElementById("saleQty").value
+    );
+
+    if(!productId || qty<=0){
+
+        alert("Select product");
+
+        return;
+    }
+
+    const product =
+    inventory.find(
+    item=>item.id===productId
+    );
+
+    if(!product){
+
+        alert("Product not found");
+
+        return;
+    }
+
+    if(product.stock < qty){
+
+        alert(
+        "Not enough stock"
+        );
+
+        return;
+    }
+
+    await addDoc(
+        collection(db,"sales"),
+        {
+            productName:
+            product.productName,
+
+            color:
+            product.color,
+
+            size:
+            product.size,
+
+            qty,
+
+            amount:
+            qty*product.price,
+
+            timestamp:
+            Date.now()
+        }
+    );
+
+    await updateDoc(
+        doc(db,"inventory",product.id),
+        {
+            stock:
+            product.stock-qty
+        }
+    );
+
+    document.getElementById(
+    "saleQty"
+    ).value="";
+});
+
+/* ---------- SALES LIST ---------- */
+
+onSnapshot(
+collection(db,"sales"),
+(snapshot)=>{
+
+    sales = [];
+
+    const salesList =
+    document.getElementById(
+    "salesList"
+    );
+
+    salesList.innerHTML="";
+
+    snapshot.forEach(docSnap=>{
+
+        const sale =
+        docSnap.data();
+
+        sales.push(sale);
+
+        salesList.innerHTML += `
+        <div class="inventory-item">
+            ${sale.productName}<br>
+            ${sale.color}
+            Size ${sale.size}<br>
+            Qty: ${sale.qty}<br>
+            KSh ${sale.amount}
+        </div>
+        `;
+    });
+
+    updateDashboard();
+});
+
+/* ---------- EXPENSES ---------- */
+
+const saveExpenseBtn =
+document.getElementById(
+"saveExpenseBtn"
+);
+
+saveExpenseBtn.addEventListener(
+"click",
+async ()=>{
+
+    const name =
+    document.getElementById(
+    "expenseName"
+    ).value;
+
+    const amount =
+    Number(
+    document.getElementById(
+    "expenseAmount"
+    ).value
+    );
+
+    if(!name || amount<=0){
+
+        alert("Enter expense");
+
+        return;
+    }
+
+    await addDoc(
+        collection(db,"expenses"),
+        {
+            name,
+            amount,
+            timestamp:
+            Date.now()
+        }
+    );
+
+    document.getElementById(
+    "expenseName"
+    ).value="";
+
+    document.getElementById(
+    "expenseAmount"
+    ).value="";
+});
+
+/* ---------- EXPENSE LIST ---------- */
+
+onSnapshot(
+collection(db,"expenses"),
+(snapshot)=>{
+
+    expenses = [];
+
+    const expenseList =
+    document.getElementById(
+    "expenseList"
+    );
+
+    expenseList.innerHTML="";
+
+    snapshot.forEach(docSnap=>{
+
+        const expense =
+        docSnap.data();
+
+        expenses.push(expense);
+
+        expenseList.innerHTML += `
+        <div class="inventory-item">
+            ${expense.name}<br>
+            KSh ${expense.amount}
+        </div>
+        `;
+    });
+
+    updateDashboard();
+});
+
+/* ---------- DASHBOARD ---------- */
+
+function updateDashboard(){
+
+    const salesTotal =
+    sales.reduce(
+    (sum,item)=>
+    sum+item.amount,
+    0
+    );
+
+    const expenseTotal =
+    expenses.reduce(
+    (sum,item)=>
+    sum+item.amount,
+    0
+    );
+
+    const profit =
+    salesTotal-expenseTotal;
+
+    document.getElementById(
+    "salesToday"
+    ).textContent =
+    "KSh "+salesTotal;
+
+    document.getElementById(
+    "expensesToday"
+    ).textContent =
+    "KSh "+expenseTotal;
+
+    document.getElementById(
+    "profitToday"
+    ).textContent =
+    "KSh "+profit;
+}
 </body>
 </html>
