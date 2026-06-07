@@ -1,51 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>Sandals Business Manager</title>
+<title>Sandals Manager</title>
+
+<link rel="stylesheet"
+href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
 
 <style>
-body{
-font-family:Arial,sans-serif;
+
+*{
 margin:0;
-background:#f5f5f5;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:#f5f7fb;
 }
 
 header{
-background:#1f2937;
+background:linear-gradient(
+135deg,
+#1296db,
+#0b6ea8
+);
 color:white;
+padding:20px;
+border-radius:0 0 25px 25px;
+}
+
+.user{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.summary{
+background:white;
+margin-top:20px;
 padding:15px;
-text-align:center;
+border-radius:20px;
+box-shadow:0 3px 10px rgba(0,0,0,.1);
+}
+
+.summary h2{
+font-size:28px;
+margin-top:5px;
 }
 
 .container{
-padding:10px;
+padding:15px;
+padding-bottom:90px;
 }
 
 .card{
 background:white;
+border-radius:20px;
 padding:15px;
-margin-bottom:10px;
-border-radius:10px;
-box-shadow:0 2px 5px rgba(0,0,0,.1);
+margin-bottom:15px;
+box-shadow:0 3px 10px rgba(0,0,0,.08);
 }
 
-input,select{
+.card h3{
+margin-bottom:10px;
+}
+
+input,
+select{
 width:100%;
-padding:10px;
-margin:5px 0;
-box-sizing:border-box;
+padding:12px;
+margin:6px 0;
+border:1px solid #ddd;
+border-radius:10px;
 }
 
 button{
 width:100%;
-padding:10px;
-background:#1f2937;
-color:white;
+padding:12px;
 border:none;
-border-radius:5px;
+background:#1296db;
+color:white;
+border-radius:10px;
+font-weight:600;
+}
+
+.inventory-item{
+padding:10px;
+border-bottom:1px solid #eee;
 }
 
 nav{
@@ -53,81 +98,151 @@ position:fixed;
 bottom:0;
 left:0;
 right:0;
-display:flex;
+height:65px;
 background:white;
-border-top:1px solid #ddd;
+display:flex;
+box-shadow:0 -3px 10px rgba(0,0,0,.1);
 }
 
 nav button{
 flex:1;
+background:none;
+color:#444;
+border:none;
 border-radius:0;
+font-size:12px;
 }
 
 .page{
 display:none;
-padding-bottom:80px;
 }
 
 .active{
 display:block;
 }
 
-h3{
-margin-top:0;
+.metric{
+display:flex;
+justify-content:space-between;
+margin-top:10px;
 }
 
-.list-item{
-border-bottom:1px solid #ddd;
-padding:8px 0;
+.metric strong{
+color:#1296db;
 }
+
 </style>
 </head>
 
 <body>
 
 <header>
-<h2>👡 Sandals Business Manager</h2>
+
+<div class="user">
+
+<div>
+
+<h2>👡 Sandals Manager</h2>
+
+<p>Victor & Wife</p>
+
+</div>
+
+</div>
+
+<div class="summary">
+
+<p>Today's Sales</p>
+
+<h2 id="salesToday">
+KSh 0
+</h2>
+
+<div class="metric">
+
+<span>Expenses</span>
+
+<strong id="expensesToday">
+KSh 0
+</strong>
+
+</div>
+
+<div class="metric">
+
+<span>Profit</span>
+
+<strong id="profitToday">
+KSh 0
+</strong>
+
+</div>
+
+</div>
+
 </header>
 
 <div class="container">
 
-<div id="dashboard" class="page active">
+<!-- DASHBOARD -->
+
+<div id="dashboard"
+class="page active">
 
 <div class="card">
-<h3>Dashboard</h3>
 
-<p><b>Sales:</b> KSh <span id="salesTotal">0</span></p>
-<p><b>Expenses:</b> KSh <span id="expenseTotal">0</span></p>
-<p><b>Profit:</b> KSh <span id="profitTotal">0</span></p>
+<h3>Business Summary</h3>
+
+<p>Total Inventory Items:
+<span id="stockCount">0</span>
+</p>
+
 </div>
 
 </div>
 
-<div id="inventory" class="page">
+<!-- INVENTORY -->
+
+<div id="inventory"
+class="page">
 
 <div class="card">
 
-<h3>Add Inventory</h3>
+<h3>Add Product</h3>
 
-<input id="name" placeholder="Product Name">
+<input
+id="productName"
+placeholder="Product Name">
 
-<input id="color" placeholder="Color">
+<input
+id="productColor"
+placeholder="Color">
 
-<input id="size" placeholder="Size">
+<input
+id="productSize"
+placeholder="Size">
 
-<input id="stock" type="number" placeholder="Stock">
+<input
+id="productStock"
+type="number"
+placeholder="Stock">
 
-<input id="price" type="number" placeholder="Selling Price">
+<input
+id="sellingPrice"
+type="number"
+placeholder="Selling Price">
 
-<button onclick="addInventory()">
+<button id="addProductBtn">
+
 Add Product
+
 </button>
 
 </div>
 
 <div class="card">
 
-<h3>Inventory List</h3>
+<h3>Inventory</h3>
 
 <div id="inventoryList"></div>
 
@@ -135,20 +250,33 @@ Add Product
 
 </div>
 
-<div id="sales" class="page">
+<!-- SALES -->
+
+<div id="sales"
+class="page">
 
 <div class="card">
 
 <h3>Record Sale</h3>
 
-<select id="saleProduct"></select>
+<select id="saleProduct">
 
-<input id="saleQty"
+<option value="">
+Select Product
+
+</option>
+
+</select>
+
+<input
+id="saleQty"
 type="number"
 placeholder="Quantity">
 
-<button onclick="saveSale()">
-Save Sale
+<button id="saveSaleBtn">
+
+Record Sale
+
 </button>
 
 </div>
@@ -163,21 +291,28 @@ Save Sale
 
 </div>
 
-<div id="expenses" class="page">
+<!-- EXPENSES -->
+
+<div id="expenses"
+class="page">
 
 <div class="card">
 
 <h3>Add Expense</h3>
 
-<input id="expenseName"
-placeholder="Expense">
+<input
+id="expenseName"
+placeholder="Expense Name">
 
-<input id="expenseAmount"
+<input
+id="expenseAmount"
 type="number"
 placeholder="Amount">
 
-<button onclick="saveExpense()">
+<button id="saveExpenseBtn">
+
 Save Expense
+
 </button>
 
 </div>
@@ -197,299 +332,36 @@ Save Expense
 <nav>
 
 <button onclick="showPage('dashboard')">
-Dashboard
+
+🏠<br>
+Home
+
 </button>
 
 <button onclick="showPage('inventory')">
-Inventory
+
+📦<br>
+Stock
+
 </button>
 
 <button onclick="showPage('sales')">
+
+💰<br>
 Sales
+
 </button>
 
 <button onclick="showPage('expenses')">
+
+🧾<br>
 Expenses
+
 </button>
 
 </nav>
 
-<script>
-
-let inventory =
-JSON.parse(localStorage.getItem("inventory")) || [];
-
-let sales =
-JSON.parse(localStorage.getItem("sales")) || [];
-
-let expenses =
-JSON.parse(localStorage.getItem("expenses")) || [];
-
-function saveData(){
-
-localStorage.setItem(
-"inventory",
-JSON.stringify(inventory)
-);
-
-localStorage.setItem(
-"sales",
-JSON.stringify(sales)
-);
-
-localStorage.setItem(
-"expenses",
-JSON.stringify(expenses)
-);
-
-}
-
-function showPage(id){
-
-document
-.querySelectorAll(".page")
-.forEach(p=>p.classList.remove("active"));
-
-document
-.getElementById(id)
-.classList.add("active");
-
-}
-
-function addInventory(){
-
-const item = {
-
-name:name.value,
-color:color.value,
-size:size.value,
-stock:Number(stock.value),
-price:Number(price.value)
-
-};
-
-inventory.push(item);
-
-saveData();
-
-name.value="";
-color.value="";
-size.value="";
-stock.value="";
-price.value="";
-
-renderInventory();
-
-}
-
-function renderInventory(){
-
-inventoryList.innerHTML="";
-saleProduct.innerHTML="";
-
-inventory.forEach((item,index)=>{
-
-inventoryList.innerHTML += `
-
-<div class="list-item">
-
-<b>${item.name}</b><br>
-
-Color: ${item.color}<br>
-
-Size: ${item.size}<br>
-
-Stock: ${item.stock}<br>
-
-Price: KSh ${item.price}
-
-</div>
-
-`;
-
-saleProduct.innerHTML += `
-
-<option value="${index}">
-${item.name} (${item.color})
-Size ${item.size}
-</option>
-
-`;
-
-});
-
-updateDashboard();
-
-}
-
-function saveSale(){
-
-let idx =
-saleProduct.value;
-
-let qty =
-Number(saleQty.value);
-
-if(qty<=0) return;
-
-if(inventory[idx].stock < qty){
-
-alert("Not enough stock");
-
-return;
-
-}
-
-inventory[idx].stock -= qty;
-
-sales.push({
-
-product:
-inventory[idx].name,
-
-color:
-inventory[idx].color,
-
-size:
-inventory[idx].size,
-
-qty,
-
-amount:
-qty * inventory[idx].price
-
-});
-
-saveData();
-
-saleQty.value="";
-
-renderInventory();
-
-renderSales();
-
-}
-
-function renderSales(){
-
-salesList.innerHTML="";
-
-sales.forEach(s=>{
-
-salesList.innerHTML += `
-
-<div class="list-item">
-
-${s.product}
-(${s.color})
-
-Size ${s.size}
-
-<br>
-
-Qty: ${s.qty}
-
-<br>
-
-Amount:
-KSh ${s.amount}
-
-</div>
-
-`;
-
-});
-
-updateDashboard();
-
-}
-
-function saveExpense(){
-
-expenses.push({
-
-name:
-expenseName.value,
-
-amount:
-Number(expenseAmount.value)
-
-});
-
-saveData();
-
-expenseName.value="";
-expenseAmount.value="";
-
-renderExpenses();
-
-}
-
-function renderExpenses(){
-
-expenseList.innerHTML="";
-
-expenses.forEach(e=>{
-
-expenseList.innerHTML += `
-
-<div class="list-item">
-
-${e.name}
-
-<br>
-
-KSh ${e.amount}
-
-</div>
-
-`;
-
-});
-
-updateDashboard();
-
-}
-
-function updateDashboard(){
-
-let salesTotal =
-sales.reduce(
-(a,b)=>a+b.amount,
-0
-);
-
-let expenseTotal =
-expenses.reduce(
-(a,b)=>a+b.amount,
-0
-);
-
-salesTotalEl =
-document.getElementById("salesTotal");
-
-expenseTotalEl =
-document.getElementById("expenseTotal");
-
-profitTotalEl =
-document.getElementById("profitTotal");
-
-salesTotalEl.textContent =
-salesTotal;
-
-expenseTotalEl.textContent =
-expenseTotal;
-
-profitTotalEl.textContent =
-salesTotal-expenseTotal;
-
-}
-
-renderInventory();
-renderSales();
-renderExpenses();
-
-</script>
+<script src="app.js" type="module"></script>
 
 </body>
 </html>
